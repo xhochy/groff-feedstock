@@ -14,4 +14,6 @@ find $SRC_DIR -type f | \
 # /usr/bin/install: cannot stat './font/devpdf/download': No such file or directory
 make -j${CPU_COUNT} font/devpdf/build_font_files
 make -j${CPU_COUNT} install
+if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" != "1" || "${CROSSCOMPILING_EMULATOR}" != "" ]]; then
 make check
+fi
