@@ -8,10 +8,6 @@ package:
 source:
   url: https://ftp.gnu.org/gnu/groff/groff-{{ version }}.tar.gz
   sha256: 6b9757f592b7518b4902eb6af7e54570bdccba37a871fddb2d30ae3863511c13
-  # patches:
-    # xref: https://trac.macports.org/ticket/59783
-    # xref: https://github.com/openembedded/openembedded-core/commit/e9beba2a
-    # - 0001-Include-config.h.patch
 
 build:
   number: 1
@@ -24,10 +20,12 @@ requirements:
     - {{ compiler('cxx') }}
     - make
     - automake
+    - gawk
     - texinfo
     - pkg-config
     - flex
     - bison
+    - netpbm
   host:
     - perl
     - libiconv  # [osx]

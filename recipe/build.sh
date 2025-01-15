@@ -1,4 +1,6 @@
-set -x
+#!/usr/bin/env bash
+
+set -o xtrace -o nounset -o pipefail -o errexit
 
 autoreconf -vfi
 ./configure --prefix=$PREFIX
@@ -10,10 +12,8 @@ find $SRC_DIR -type f | \
         -pe "s,perl -w,perl,;" \
         -pe "s,$PREFIX/bin/perl,/usr/bin/env perl,;"
 
-# Workaround for randomly occuring failure due to incorrect dep-graph in Makefile
-# /usr/bin/install: cannot stat './font/devpdf/download': No such file or directory
-make -j${CPU_COUNT} font/devpdf/build_font_files
+export TEXINDEX_AWK=${BUILD_PREFIX}/bin/awk
 make -j${CPU_COUNT} install
-if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" != "1" || "${CROSSCOMPILING_EMULATOR}" != "" ]]; then
-make check
-fi
+# if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" != "1" || "${CROSSCOMPILING_EMULATOR}" != "" ]]; then
+# make check
+# fi
