@@ -25,6 +25,7 @@ requirements:
     - pkg-config
     - flex
     - bison
+    - ghostscript
     - netpbm
   host:
     - perl
