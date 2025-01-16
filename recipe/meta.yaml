@@ -6,8 +6,11 @@ package:
   version: {{ version }}
 
 source:
-  url: https://ftp.gnu.org/gnu/groff/groff-{{ version }}.tar.gz
-  sha256: 6b9757f592b7518b4902eb6af7e54570bdccba37a871fddb2d30ae3863511c13
+  - url: https://ftp.gnu.org/gnu/groff/groff-{{ version }}.tar.gz
+    sha256: 6b9757f592b7518b4902eb6af7e54570bdccba37a871fddb2d30ae3863511c13
+  - url: https://github.com/ArtifexSoftware/urw-base35-fonts/archive/20200910.tar.gz
+    sha256: e0d9b7f11885fdfdc4987f06b2aa0565ad2a4af52b22e5ebf79e1a98abd0ae2f
+    folder: urw-base35-fonts
 
 build:
   number: 1

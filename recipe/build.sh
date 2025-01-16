@@ -22,7 +22,7 @@ if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" == "1" ]]; then
     RANLIB="${RANLIB//${CONDA_TOOLCHAIN_HOST}/${CONDA_TOOLCHAIN_BUILD}}"
 
     autoreconf --force --verbose --install
-    ./configure --prefix=$BUILD_PREFIX
+    ./configure --prefix=$BUILD_PREFIX --with-urw-fonts-dir=${SRC_DIR}/urw-base35-fonts/fonts
 
     # Workaround for long shebang lines
     find $SRC_DIR -type f | \
@@ -45,7 +45,7 @@ if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" == "1" ]]; then
 fi
 
 autoreconf --force --verbose --install
-./configure --prefix=$PREFIX
+./configure --prefix=$PREFIX --with-urw-fonts-dir=${SRC_DIR}/urw-base35-fonts/fonts
 
 # Workaround for long shebang lines
 find $SRC_DIR -type f | \
@@ -55,6 +55,6 @@ find $SRC_DIR -type f | \
         -pe "s,$PREFIX/bin/perl,/usr/bin/env perl,;"
 
 make --trace -j${CPU_COUNT} install ${make_args}
-# if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" != "1" || "${CROSSCOMPILING_EMULATOR}" != "" ]]; then
-# make check
-# fi
+if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" != "1" || "${CROSSCOMPILING_EMULATOR}" != "" ]]; then
+make check
+fi
