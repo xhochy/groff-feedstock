@@ -6,7 +6,7 @@ export TEXINDEX_AWK=${BUILD_PREFIX}/bin/awk
 
 make_args=""
 
-if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" != "1" || "${CROSSCOMPILING_EMULATOR:-}" != "" ]]; then
+if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" == "1" ]]; then
     CROSS_LDFLAGS=${LDFLAGS}
     CROSS_CC="${CC}"
     CROSS_LD="${LD}"
