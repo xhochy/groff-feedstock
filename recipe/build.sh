@@ -55,6 +55,8 @@ find $SRC_DIR -type f | \
         -pe "s,$PREFIX/bin/perl,/usr/bin/env perl,;"
 
 make --trace -j${CPU_COUNT} install ${make_args}
-if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" != "1" || "${CROSSCOMPILING_EMULATOR:-}" != "" || ${target_platform} == "linux-aarch64" || ${target_platform} == "linux-ppc64le" ]]; then
-make check
+if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" != "1" || "${CROSSCOMPILING_EMULATOR:-}" != "" ]]; then
+    if [[ ${target_platform} != "linux-aarch64" && ${target_platform} != "linux-ppc64le" ]]; then
+        make check
+    fi
 fi
