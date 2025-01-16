@@ -8,12 +8,16 @@ make_args=""
 
 if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" == "1" ]]; then
     CROSS_LDFLAGS=${LDFLAGS}
+    CROSS_AR="${AR}"
     CROSS_CC="${CC}"
     CROSS_LD="${LD}"
+    CROSS_RANLIB="${RANLIB}"
 
     LDFLAGS=${LDFLAGS//${PREFIX}/${BUILD_PREFIX}}
+    AR=${AR//${CONDA_TOOLCHAIN_HOST}/${CONDA_TOOLCHAIN_BUILD}}
     CC=${CC//${CONDA_TOOLCHAIN_HOST}/${CONDA_TOOLCHAIN_BUILD}}
     LD="${LD//${CONDA_TOOLCHAIN_HOST}/${CONDA_TOOLCHAIN_BUILD}}"
+    RANLIB="${RANLIB//${CONDA_TOOLCHAIN_HOST}/${CONDA_TOOLCHAIN_BUILD}}"
 
     autoreconf --force --verbose --install
     ./configure --prefix=$BUILD_PREFIX
@@ -29,8 +33,10 @@ if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" == "1" ]]; then
     make clean
 
     LDFLAGS="${CROSS_LDFLAGS}"
+    AR=${CROSS_AR}
     CC=${CROSS_CC}
     LD=${CROSS_LD}
+    RANLIB=${CROSS_RANLIB}
 
     make_args="GROFFBIN=${BUILD_PREFIX}/bin/groff GROFF_BIN_PATH=${BUILD_PREFIX}/bin PDFMOMBIN=${BUILD_PREFIX}/bin/pdfmom"
 fi

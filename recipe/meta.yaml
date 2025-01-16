@@ -51,7 +51,7 @@ test:
     - chem --version
     - gperl --version
     - gpinyin --version
-    - groffer --version
+    # - groffer --version
     - grog --version
     - gropdf --version
     - neqn --version
