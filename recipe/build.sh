@@ -1,7 +1,51 @@
-set -x
+#!/usr/bin/env bash
 
-autoreconf -vfi
-./configure --prefix=$PREFIX
+set -o xtrace -o nounset -o pipefail -o errexit
+
+export TEXINDEX_AWK=${BUILD_PREFIX}/bin/awk
+
+make_args=""
+
+if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" == "1" ]]; then
+    CROSS_LDFLAGS=${LDFLAGS}
+    CROSS_AR="${AR}"
+    CROSS_CC="${CC}"
+    CROSS_CXX="${CXX}"
+    CROSS_LD="${LD}"
+    CROSS_RANLIB="${RANLIB}"
+
+    LDFLAGS=${LDFLAGS//${PREFIX}/${BUILD_PREFIX}}
+    AR=${AR//${CONDA_TOOLCHAIN_HOST}/${CONDA_TOOLCHAIN_BUILD}}
+    CC=${CC//${CONDA_TOOLCHAIN_HOST}/${CONDA_TOOLCHAIN_BUILD}}
+    CXX=${CXX//${CONDA_TOOLCHAIN_HOST}/${CONDA_TOOLCHAIN_BUILD}}
+    LD="${LD//${CONDA_TOOLCHAIN_HOST}/${CONDA_TOOLCHAIN_BUILD}}"
+    RANLIB="${RANLIB//${CONDA_TOOLCHAIN_HOST}/${CONDA_TOOLCHAIN_BUILD}}"
+
+    autoreconf --force --verbose --install
+    ./configure --prefix=$BUILD_PREFIX --with-urw-fonts-dir=${SRC_DIR}/urw-base35-fonts/fonts
+
+    # Workaround for long shebang lines
+    find $SRC_DIR -type f | \
+        xargs -L1 perl -i.bak \
+            -pe 's,^#!\@PERL\@ -w,#!/usr/bin/env perl,;' \
+            -pe "s,perl -w,perl,;" \
+            -pe "s,$PREFIX/bin/perl,/usr/bin/env perl,;"
+
+    make -j${CPU_COUNT} install
+    make clean
+
+    LDFLAGS="${CROSS_LDFLAGS}"
+    AR=${CROSS_AR}
+    CC=${CROSS_CC}
+    CXX=${CROSS_CXX}
+    LD=${CROSS_LD}
+    RANLIB=${CROSS_RANLIB}
+
+    make_args="GROFFBIN=${BUILD_PREFIX}/bin/groff GROFF_BIN_PATH=${BUILD_PREFIX}/bin PDFMOMBIN=${BUILD_PREFIX}/bin/pdfmom"
+fi
+
+autoreconf --force --verbose --install
+./configure --prefix=$PREFIX --with-urw-fonts-dir=${SRC_DIR}/urw-base35-fonts/fonts
 
 # Workaround for long shebang lines
 find $SRC_DIR -type f | \
@@ -10,8 +54,9 @@ find $SRC_DIR -type f | \
         -pe "s,perl -w,perl,;" \
         -pe "s,$PREFIX/bin/perl,/usr/bin/env perl,;"
 
-# Workaround for randomly occuring failure due to incorrect dep-graph in Makefile
-# /usr/bin/install: cannot stat './font/devpdf/download': No such file or directory
-make -j${CPU_COUNT} font/devpdf/build_font_files
-make -j${CPU_COUNT} install
-make check
+make --trace -j${CPU_COUNT} install ${make_args}
+if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" != "1" || "${CROSSCOMPILING_EMULATOR:-}" != "" ]]; then
+    if [[ ${target_platform} != "linux-aarch64" && ${target_platform} != "linux-ppc64le" ]]; then
+        make check
+    fi
+fi

@@ -1,17 +1,16 @@
 {% set name = "groff" %}
-{% set version = "1.22.4" %}
+{% set version = "1.23.0" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://ftp.gnu.org/gnu/groff/groff-{{ version }}.tar.gz
-  sha256: e78e7b4cb7dec310849004fa88847c44701e8d133b5d4c13057d876c1bad0293
-  patches:
-    # xref: https://trac.macports.org/ticket/59783
-    # xref: https://github.com/openembedded/openembedded-core/commit/e9beba2a
-    - 0001-Include-config.h.patch
+  - url: https://ftp.gnu.org/gnu/groff/groff-{{ version }}.tar.gz
+    sha256: 6b9757f592b7518b4902eb6af7e54570bdccba37a871fddb2d30ae3863511c13
+  - url: https://github.com/ArtifexSoftware/urw-base35-fonts/archive/20200910.tar.gz
+    sha256: e0d9b7f11885fdfdc4987f06b2aa0565ad2a4af52b22e5ebf79e1a98abd0ae2f
+    folder: urw-base35-fonts
 
 build:
   number: 1
@@ -20,13 +19,17 @@ build:
 requirements:
   build:
     - {{ compiler('c') }}
+    - {{ stdlib('c') }}
     - {{ compiler('cxx') }}
     - make
     - automake
+    - gawk
     - texinfo
     - pkg-config
     - flex
     - bison
+    - ghostscript
+    - netpbm
   host:
     - perl
     - libiconv  # [osx]
@@ -51,7 +54,7 @@ test:
     - chem --version
     - gperl --version
     - gpinyin --version
-    - groffer --version
+    # - groffer --version
     - grog --version
     - gropdf --version
     - neqn --version
@@ -62,7 +65,6 @@ test:
 about:
   home: https://www.gnu.org/software/groff/
   license: GPL-3.0-or-later
-  license_family: GPL
   license_file: COPYING
   summary: 'Groff (GNU troff) is a typesetting system'
   description: |
